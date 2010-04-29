@@ -1,3 +1,3 @@
 #!/usr/bin/env python
 
-#This is just boilerplate, replace this with the ral content of btrfsguitools.py
+#This is just boilerplate, replace this with the real content of btrfsguitools.py
