@@ -5,4 +5,5 @@ PyQT (For the QT interface)
 btrfs-tools
 
 Install:
-python install.py
+python install.py --interface={GTK|QT|cmd}
+(You can specify as many --interface options as you want)
