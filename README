@@ -1,0 +1,8 @@
+Dependancies:
+SQLAlchemy
+PyGTK (For the GTK interface)
+PyQT (For the QT interface)
+btrfs-tools
+
+Install:
+python install.py
