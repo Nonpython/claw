@@ -1,5 +1,5 @@
 Dependancies:
-SQLAlchemy
+SQLAlchemy 0.5.x
 PyGTK (For the GTK interface)
 PyQT (For the QT interface)
 btrfs-tools
