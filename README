@@ -8,7 +8,7 @@ Install:
 python install.py --interface={GTK|QT}
 (You can specify only one --interface option)
 
-If you want to "try before you buy", just run btrfsguitools.py --interface={GTK|QT|cmd}
+If you want to "try before you buy", just run btrfsguitools.py --interface={GTK|QT}
 (You can specify only one --interface option)
 
 
