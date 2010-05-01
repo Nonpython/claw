@@ -38,24 +38,10 @@ class SQLAlchemyMagic(_Base):
     def __repr__(self):
         return "<SnapshotTableMap (Date: %s, Comment: %s)>" % (self.date, (comment or "None"))
 
-#if GTK
 class GTKGUIInterface(object):
     """Contains the GTK GUI code"""
     pass
-#end if
 
-#if Qt
-class QtGUIInterface(object):
-    """Contains the Qt GUI code"""
-    pass
-#end if
-
-if not installed:
-    # Grabs the chosen interface, [0][0][1] is the proper magic subscript to get it.
-    interface = getopt.getopt(sys.argv[1:], '', ['interface='])[0][0][1]
-    if   interface == 'GTK':
-        UIClass  =  GTKGUIInterface()
-    elif interface == 'Qt':
-        UIClass  =   QtGUIInterface()
+UIClass  =  GTKGUIInterface()
 
 UIClass.runUI()
