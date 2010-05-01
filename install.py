@@ -37,7 +37,7 @@ try:
         pygtk.require('2.10')
     except AssertionError:
         die()
-except ImportError:
+except:
     die("You need PyGTK 2.10 or newer, preferably 2.12 or newer.")
 
 # This copies the file to the right location.
