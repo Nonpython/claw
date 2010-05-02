@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import getopt, sys, os, sqlalchemy, sqlalchemy.orm, sys
+import getopt, sys, os, sqlalchemy, sqlalchemy.orm, sys, gtk
 from sqlalchemy.ext.declarative import declarative_base as _Base
 
 #Checks to see if the SQLAlchemy version is in the right range.
@@ -41,6 +41,7 @@ class SQLAlchemyMagic(_Base, object):
 class GTKGUIInterface(object):
     """Contains the GTK GUI code and connective glue for SQLAlchemy."""
     def __init__(self):
+        self.DBSession = sqlalchemy.orm.sessionmaker(bind=engine)
         
 
 UIClass  =  GTKGUIInterface()
