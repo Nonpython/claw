@@ -42,7 +42,7 @@ class GTKGUIInterface(object):
     """Contains the GTK GUI code and connective glue for SQLAlchemy."""
     def __init__(self):
         self.DBSession = sqlalchemy.orm.sessionmaker(bind=engine)
-        
+        self.KnownItems = []
 
 UIClass  =  GTKGUIInterface()
 
