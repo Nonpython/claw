@@ -23,24 +23,25 @@ else: # If this happens it has been funged by the installer, so I can talk to
       # the existing SQLite database.
     engine = sqlalchemy.create_engine('sqlite:////usr/share/btrfsguitools/snapshot.db')
 
-class SQLAlchemyMagic(_Base):
+class SQLAlchemyMagic(_Base, object):
     """Uses SQLAlchemy's declarative extension to map a database to a Python class in order to store btrfs snapshots."""
     # Sets up the table.
     __tablename__  = "snapshots"
-    self.id        = sqlalchemy.Column(Integer, primary_key=True)
-    self.datestamp = sqlalchemy.Column(String)
-    self.comment   = sqlalchemy.Column(String)
+    self.id        = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    self.datestamp = sqlalchemy.Column(sqlalchemy.String)
+    self.comment   = sqlalchemy.Column(sqlalchemy.String)
 
     def __init__(self, date, comment):
         self.date = date
         self.comment = comment
         
     def __repr__(self):
-        return "<SnapshotTableMap (Date: %s, Comment: %s)>" % (self.date, (comment or "None"))
+        return "<SnapshotTableMap (Date: %s, Comment: %s)>" % (self.date, (self.comment or "None"))
 
 class GTKGUIInterface(object):
-    """Contains the GTK GUI code"""
-    pass
+    """Contains the GTK GUI code and connective glue for SQLAlchemy."""
+    def __init__(self):
+        
 
 UIClass  =  GTKGUIInterface()
 
