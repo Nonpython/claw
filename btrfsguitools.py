@@ -27,9 +27,9 @@ class SQLAlchemyMagic(_Base, object):
     """Uses SQLAlchemy's declarative extension to map a database to a Python class in order to store btrfs snapshots."""
     # Sets up the table.
     __tablename__  = "snapshots"
-    self.id        = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    self.datestamp = sqlalchemy.Column(sqlalchemy.String)
-    self.comment   = sqlalchemy.Column(sqlalchemy.String)
+    id        = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    datestamp = sqlalchemy.Column(sqlalchemy.String)
+    comment   = sqlalchemy.Column(sqlalchemy.String)
 
     def __init__(self, date, comment):
         self.date = date
@@ -43,6 +43,8 @@ class GTKGUIInterface(object):
     def __init__(self):
         self.DBSession = sqlalchemy.orm.sessionmaker(bind=engine)
         self.KnownItems = []
+        for column in self.DBSession.query(SQLALchemyMagic)
+        
 
 UIClass  =  GTKGUIInterface()
 
