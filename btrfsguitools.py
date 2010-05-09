@@ -1,6 +1,12 @@
 #!/usr/bin/env python
-import getopt, sys, os, sqlalchemy, sqlalchemy.orm, sys, gtk
-from sqlalchemy.ext.declarative import declarative_base as _Base
+import getopt
+import sys
+import os
+import sqlalchemy
+import sqlalchemy.orm
+import sys
+import gtk
+from   sqlalchemy.ext.declarative import declarative_base as _Base
 
 #Checks to see if the SQLAlchemy version is in the right range.
 if  "0.6" not in sqlalchemy.__version__:
@@ -27,9 +33,9 @@ class SQLAlchemyMagic(_Base, object):
     """Uses SQLAlchemy's declarative extension to map a database to a Python class in order to store btrfs snapshots."""
     # Sets up the table.
     __tablename__  = "snapshots"
-    id        = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    datestamp = sqlalchemy.Column(sqlalchemy.String)
-    comment   = sqlalchemy.Column(sqlalchemy.String)
+    self.id        = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    self.datestamp = sqlalchemy.Column(sqlalchemy.String)
+    self.comment   = sqlalchemy.Column(sqlalchemy.String)
 
     def __init__(self, date, comment):
         self.date = date
@@ -43,8 +49,6 @@ class GTKGUIInterface(object):
     def __init__(self):
         self.DBSession = sqlalchemy.orm.sessionmaker(bind=engine)
         self.KnownItems = []
-        for column in self.DBSession.query(SQLALchemyMagic)
-        
 
 UIClass  =  GTKGUIInterface()
 
