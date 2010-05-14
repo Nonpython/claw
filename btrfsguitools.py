@@ -4,7 +4,8 @@ from sqlalchemy.ext.declarative import declarative_base as _Base
 
 #Checks to see if the SQLAlchemy version is in the right range.
 if  "0.6" not in sqlalchemy.__version__:
-    sys.exit("Your SQLAlchemy is too old or too new!\nYou need 0.6.0 or newer but older then 0.7.0.")
+    sys.exit("Your SQLAlchemy is too old or too new!\nYou need 0.6.0 or newer \
+but older then 0.7.0.")
 
 #Converts the magic function to the magic class.
 _Base = _Base()
@@ -21,10 +22,12 @@ if not installed: # Checks if the source has been funged by the installer
                                                     # in memory.
 else: # If this happens it has been funged by the installer, so I can talk to
       # the existing SQLite database.
-    engine = sqlalchemy.create_engine('sqlite:////usr/share/btrfsguitools/snapshot.db')
+    engine = sqlalchemy.create_engine(
+        'sqlite:////usr/share/btrfsguitools/snapshot.db')
 
 class SQLAlchemyMagic(_Base, object):
-    """Uses SQLAlchemy's declarative extension to map a database to a Python class in order to store btrfs snapshots."""
+    "Uses SQLAlchemy's declarative extension to map a database to a Python \
+class in order to store btrfs snapshots."
     # Sets up the table.
     __tablename__  = "snapshots"
     id              = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
@@ -36,10 +39,11 @@ class SQLAlchemyMagic(_Base, object):
         self.comment  = comment
         
     def __repr__(self):    
-        return "<SnapshotTableMap (Date: %s, Comment: %s)>" % (self.date, (self.comment or "None"))
+        return "<SnapshotTableMap (Date: %s, Comment: %s)>" % (self.date,
+                                                (self.comment or "None"))
 
 class GTKGUIInterface(object):
-    """Contains the GTK GUI code and connective glue for SQLAlchemy."""
+    "Contains the GTK GUI code and connective glue for SQLAlchemy."
     def __init__(self):
         # Checks the database for existing snapshots.
         self.DBSession = sqlalchemy.orm.sessionmaker(bind=engine)
@@ -67,7 +71,8 @@ class GTKGUIInterface(object):
         tdstamp += "%i:" % (timedate[4])
         tdstamp += "%i" % (timedate[5])
         print tdstamp
-        subprocess.Popen("btrfsctl " + "-s btrfsguitools-%s /" % (tdstamp), shell=True)
+        subprocess.Popen("btrfsctl " + \
+                         "-s btrfsguitools-%s /" % (tdstamp), shell=True)
         self.KnownItems.append(SQLAlchemyMagic(tdstamp, comment))
     def runUI(self):
         pass
