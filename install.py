@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+"""This is my installer, I have it as a template, so I use it as a install
+    framework for my software."""
 from shutil     import             copy
 from shutil     import Error    as CopyError
 from os         import             chmod, chown
@@ -8,7 +10,7 @@ from sys        import exit     as die
 from grp        import getgrnam as GetGroupStructByName
 from pwd        import getpwnam as GetUserStructByName
 
-# The Get?ID's Get{Group|User}StructByName functions return a structure of
+# The Get?ID's Get?StructByName functions return a structure of
 # useless (to us) information and one useful thing: the ?ID at the subscript
 # [2].
 
@@ -59,16 +61,16 @@ try:
     chmod('/usr/sbin/btrfsguitools', S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | \
                                      S_IXGRP)
     try:
-        gid = GetGIDByName('wheel')
+        GID = GetGIDByName('wheel')
     except KeyError:
-        gid = -1
+        GID = -1
     chown('/usr/sbin/btrfsguitools', GetUIDByName('root'), gid)
 except OSError:
     die("There was a error setting the proper ownership and permission.")
 
 # Some people may want a wrapper that automaticlly uses gksu[do]? for them.
 if raw_input('Do you want a wrapper? [yn] ').lower() == 'y':
-        open('/usr/bin/btrfsguitools', 'w').writelines(['#!/bin/sh\n',
-                                                        'gksu \
-                                                        /usr/sbin/btrfsguitools'
-                                                        ])
+    open('/usr/bin/btrfsguitools', 'w').writelines(['#!/bin/sh\n',
+                                                    'gksu \
+                                                    /usr/sbin/btrfsguitools'
+                                                    ])
