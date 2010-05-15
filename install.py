@@ -5,10 +5,13 @@ from shutil     import             copy
 from shutil     import Error    as CopyError
 from os         import             chmod, chown
 from os         import getuid   as GetProcessUID
-from stat       import             S_IRUSR, S_IWUSR, S_IXUSR, S_IRGRP, S_IXGRP
+from stat       import             S_IRUSR, S_IWUSR, S_IXUSR, S_IRGRP, \
+                                           S_IWGRP, S_IXGRP
 from sys        import exit     as die
 from grp        import getgrnam as GetGroupStructByName
 from pwd        import getpwnam as GetUserStructByName
+import sqlite3, os
+
 
 # The Get?ID's Get?StructByName functions return a structure of
 # useless (to us) information and one useful thing: the ?ID at the subscript
@@ -56,15 +59,34 @@ try:
 except IOError:
     die("There was a error modifing the program after the installation.")
 
+try:
+    os.mkdir('/usr/share/btrfsguitools')
+except:
+    die('Something went wrong creating the directory "/usr/share/btrfsguitools"!')
+
+conn = sqlite3.connect('/usr/share/btrfsguitools/snapshot.db')
+c = conn.cursor()
+c.execute("""CREATE TABLE snapshots (
+	id INTEGER NOT NULL, 
+	datestamp VARCHAR, 
+	comment VARCHAR, 
+	PRIMARY KEY (id)
+);""")
+conn.commit()
+c.close()
+
 # This sets the proper ownership and permissions.
 try:
     chmod('/usr/sbin/btrfsguitools', S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | \
                                      S_IXGRP)
+    chmod('/usr/share/btrfsguitools/snapshot.db', S_IRUSR | S_IWUSR | S_IRGRP \
+                                                                                     | S_IWGRP)
     try:
         GID = GetGIDByName('wheel')
     except KeyError:
         GID = -1
     chown('/usr/sbin/btrfsguitools', GetUIDByName('root'), GID)
+    chown('/usr/share/btrfsguitools/snapshot.db', GetUIDByName('root'), GID)
 except OSError:
     die("There was a error setting the proper ownership and permission.")
 
