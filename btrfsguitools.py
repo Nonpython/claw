@@ -20,6 +20,8 @@ if not installed: # Checks if the source has been funged by the installer
                                                     # phrase to tell SQLAlchemy
                                                     # to keep the SQLite databse
                                                     # in memory.
+                                                    # to keep the SQLite
+                                                    # database in memory.
 else: # If this happens it has been funged by the installer, so I can talk to
       # the existing SQLite database.
     engine = sqlalchemy.create_engine(
