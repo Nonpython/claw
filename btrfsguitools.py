@@ -48,7 +48,7 @@ class GTKGUIInterface(object):
         # Checks the database for existing snapshots.
         self.DBSession = sqlalchemy.orm.sessionmaker(bind=engine)
         self.KnownItems = []
-        for column in self.DBSession.query(SQLALchemyMagic):
+        for column in self.DBSession.query(SQLAlchemyMagic):
             self.KnownItems.append(column)
     
     def AddDBItem(self,comment):
