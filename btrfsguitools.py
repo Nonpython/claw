@@ -47,9 +47,12 @@ class SQLAlchemyMagic(DeclarativeBase, object):
 class GTKGUIInterface(object):
     "Contains the GTK GUI code and connective glue for SQLAlchemy."
     def __init__(self):
+        metadata = DeclarativeBase.metadata
+        if not installed:
+            metadata.create_all(engine)
         # Checks the database for existing snapshots.
         self.KnownItems = []
-        for column in DBSession.query():
+        for column in DBSession.query(SQLAlchemyMagic).all():
             self.KnownItems.append(column)
 
     def TimeStamper(self):
@@ -76,7 +79,7 @@ class GTKGUIInterface(object):
     def AddDBItem(self,comment):
         subprocess.Popen("btrfsctl " + \
                          "-s btrfsguitools-%s /" % (tdstamp), shell=True)
-        self.KnownItems.append(SQLAlchemyMagic(self.TimeStamper(), comment))
+        DBSession.add( SQLAlchemyMagic(self.TimeStamper(), comment))
     def RunUI(self):
         pass
 
