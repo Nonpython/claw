@@ -64,7 +64,7 @@ try:
         GID = GetGIDByName('wheel')
     except KeyError:
         GID = -1
-    chown('/usr/sbin/btrfsguitools', GetUIDByName('root'), gid)
+    chown('/usr/sbin/btrfsguitools', GetUIDByName('root'), GID)
 except OSError:
     die("There was a error setting the proper ownership and permission.")
 

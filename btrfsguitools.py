@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-import getopt, sys, os, sqlalchemy, sqlalchemy.orm, sys, gtk, subprocess, time
+import getopt, sys, os, sqlalchemy, sys, gtk, subprocess, time
 from sqlalchemy.ext.declarative import declarative_base as _Base
+from sqlalchemy.orm                 import  sessionmaker, scoped_session
 
 #Checks to see if the SQLAlchemy version is in the right range.
 if  "0.6" not in sqlalchemy.__version__:
@@ -25,9 +26,11 @@ else: # If this happens it has been funged by the installer, so I can talk to
     engine = sqlalchemy.create_engine(
         'sqlite:////usr/share/btrfsguitools/snapshot.db')
 
+DBSession = scoped_session(sessionmaker(bind=engine))
+
 class SQLAlchemyMagic(_Base, object):
-    "Uses SQLAlchemy's declarative extension to map a database to a Python \
-class in order to store btrfs snapshots."
+    "Uses SQLAlchemy's declarative extension to map a database to a Python" + \
+    " class in order to store btrfs snapshots."
     # Sets up the table.
     __tablename__  = "snapshots"
     id              = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
@@ -46,13 +49,11 @@ class GTKGUIInterface(object):
     "Contains the GTK GUI code and connective glue for SQLAlchemy."
     def __init__(self):
         # Checks the database for existing snapshots.
-        self.DBSession = sqlalchemy.orm.sessionmaker(bind=engine)
         self.KnownItems = []
-        for column in self.DBSession.query(SQLAlchemyMagic):
+        for column in DBSession.query():
             self.KnownItems.append(column)
-    
-    def AddDBItem(self,comment):
-        timedate = time.localtime()
+
+    def TimeStamper(self, struct_time):
         tdstamp = ''
         # This is a nifty little hack that greatly speeds
         # up the generation of the datestamp.
@@ -70,12 +71,15 @@ class GTKGUIInterface(object):
         tdstamp += ",%i:" % (timedate[3])
         tdstamp += "%i:" % (timedate[4])
         tdstamp += "%i" % (timedate[5])
-        print tdstamp
+
+    def AddDBItem(self,comment):
+        timedate = time.localtime()
         subprocess.Popen("btrfsctl " + \
                          "-s btrfsguitools-%s /" % (tdstamp), shell=True)
         self.KnownItems.append(SQLAlchemyMagic(tdstamp, comment))
-    def runUI(self):
+    def RunUI(self):
         pass
-UIClass  =  GTKGUIInterface()
 
-UIClass.runUI()
+UIClass  = GTKGUIInterface()
+
+UIClass.RunUI()
