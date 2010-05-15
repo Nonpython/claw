@@ -8,7 +8,7 @@ if  "0.6" not in sqlalchemy.__version__:
 but older then 0.7.0.")
 
 #Converts the magic function to the magic class.
-_Base = _Base()
+DeclarativeBase = _Base()
 
 # This flag gets funged by the installer to denote the install status of the
 # program.
@@ -25,9 +25,9 @@ else: # If this happens it has been funged by the installer, so I can talk to
     engine = sqlalchemy.create_engine(
         'sqlite:////usr/share/btrfsguitools/snapshot.db')
 
-DBSession = scoped_session(sessionmaker(bind=engine))
+DBSession = sqlalchemy.orm.scoped_session(sqlalchemy.orm.sessionmaker(bind=engine))
 
-class SQLAlchemyMagic(_Base, object):
+class SQLAlchemyMagic(DeclarativeBase, object):
     "Uses SQLAlchemy's declarative extension to map a database to a Python" + \
     " class in order to store btrfs snapshots."
     # Sets up the table.
@@ -40,7 +40,7 @@ class SQLAlchemyMagic(_Base, object):
         self.date          = date
         self.comment  = comment
         
-    def __repr__(self):    
+    def __repr__(self):
         return "<SnapshotTableMap (Date: %s, Comment: %s)>" % (self.date,
                                                 (self.comment or "None"))
 
@@ -52,7 +52,8 @@ class GTKGUIInterface(object):
         for column in DBSession.query():
             self.KnownItems.append(column)
 
-    def TimeStamper(self, struct_time):
+    def TimeStamper(self):
+        timedate = time.localtime()
         tdstamp = ''
         # This is a nifty little hack that greatly speeds
         # up the generation of the datestamp.
@@ -70,12 +71,12 @@ class GTKGUIInterface(object):
         tdstamp += ",%i:" % (timedate[3])
         tdstamp += "%i:" % (timedate[4])
         tdstamp += "%i" % (timedate[5])
+        return tdstamp
 
     def AddDBItem(self,comment):
-        timedate = time.localtime()
         subprocess.Popen("btrfsctl " + \
                          "-s btrfsguitools-%s /" % (tdstamp), shell=True)
-        self.KnownItems.append(SQLAlchemyMagic(tdstamp, comment))
+        self.KnownItems.append(SQLAlchemyMagic(self.TimeStamper(), comment))
     def RunUI(self):
         pass
 
