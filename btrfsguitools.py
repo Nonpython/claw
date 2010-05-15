@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-import getopt, sys, os, sqlalchemy, sys, gtk, subprocess, time
+import getopt, sys, os, sqlalchemy, sys, gtk, subprocess, time, sqlalchemy.orm
 from sqlalchemy.ext.declarative import declarative_base as _Base
-from sqlalchemy.orm                 import  sessionmaker, scoped_session
 
 #Checks to see if the SQLAlchemy version is in the right range.
 if  "0.6" not in sqlalchemy.__version__:
