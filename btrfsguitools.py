@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import getopt, sys, os, sqlalchemy, sys, gtk, subprocess, time, sqlalchemy.orm
+import sys, os, sqlalchemy, sys, subprocess, time, sqlalchemy.orm, gtk
 from sqlalchemy.ext.declarative import declarative_base as _Base
 
 #Checks to see if the SQLAlchemy version is in the right range.
@@ -45,9 +45,10 @@ class SQLAlchemyMagic(DeclarativeBase, object):
         return "<SnapshotTableMap (Date: %s, Comment: %s)>" % (self.date,
                                                 (self.comment or "None"))
 
-class GTKGUIInterface(object):
+class UIInterface(object, gtk.Window):
     "Contains the GTK GUI code and connective glue for SQLAlchemy."
     def __init__(self):
+        super(UIInterface, self).__init__()
         self.metadata = DeclarativeBase.metadata
         if not installed:
             self.metadata.create_all(engine)
@@ -84,8 +85,10 @@ class GTKGUIInterface(object):
         DBSession.commit()
         
     def RunUI(self):
-        pass
+        self.connect("destroy", gtk.main_quit)
+        self.set_title("Claw")
+        self.set_icon_from_file("/usr/share/btrfsguitools/claw.png")
 
-UIClass  = GTKGUIInterface()
+UIClass  = UIInterface()
 
 UIClass.RunUI()
