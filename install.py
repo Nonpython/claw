@@ -8,10 +8,14 @@ from os         import getuid   as GetProcessUID
 from stat       import             S_IRUSR, S_IWUSR, S_IXUSR, S_IRGRP, \
                                            S_IWGRP, S_IXGRP
 from sys        import exit     as die
+from sys        import argv
 from grp        import getgrnam as GetGroupStructByName
 from pwd        import getpwnam as GetUserStructByName
-import sqlite3, os, base64
+import sqlite3, os, base64, getopt
 
+for OptTuple in getopt.getopt(argv[1:])[0]:
+    if OptTuple == '--prefix':
+        prefix = OptTuple[1]
 
 # The Get?ID's Get?StructByName functions return a structure of
 # useless (to us) information and one useful thing: the ?ID at the subscript
@@ -47,24 +51,24 @@ except:
 
 # This copies the file to the right location.
 try:
-    copy('./btrfsguitools.py', '/usr/sbin/btrfsguitools')
+    copy('./btrfsguitools.py', '%s/btrfsguitools' % prefix)
 except CopyError:
     die("There was a error installing the program.")
 
 # This funges the file so that it knows that it is installed.
 try:
-    btrfsguitools = open('/usr/sbin/btrfsguitools.py', 'r').readlines()
-    btrfsguitools[13] = 'installed = True\n'
-    open('/usr/sbin/btrfsguitools.py', 'w').writelines(btrfsguitools)
+    btrfsguitools = open('%s/sbin/btrfsguitools.py', (prefix), 'r').readlines()
+    btrfsguitools[15] = 'installed = True\n'
+    open('%s/sbin/btrfsguitools.py' % (prefix), 'w').writelines(btrfsguitools)
 except IOError:
     die("There was a error modifing the program after the installation.")
 
 try:
-    os.mkdir('/usr/share/btrfsguitools')
+    os.mkdir('%s/share/btrfsguitools' % (prefix))
 except:
-    die('Something went wrong creating the directory "/usr/share/btrfsguitools"!')
+    die('Something went wrong creating the directory "%s/share/btrfsguitools"!' % (prefix))
 
-conn = sqlite3.connect('/usr/share/btrfsguitools/snapshot.db')
+conn = sqlite3.connect('%s/share/btrfsguitools/snapshot.db' % (prefix))
 c = conn.cursor()
 c.execute("""CREATE TABLE snapshots (
 	id INTEGER NOT NULL, 
@@ -75,7 +79,7 @@ c.execute("""CREATE TABLE snapshots (
 conn.commit()
 c.close()
 
-open('/usr/share/btrfsguitools/icon.png','w').write(base64.decodestring("""iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACI0lEQVR4nH2TT0gUURzHP7PMyiPm
+open('%s/share/btrfsguitools/icon.png' % (prefix),'w').write(base64.decodestring("""iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACI0lEQVR4nH2TT0gUURzHP7PMyiPm
 8A6LDdFhCINhDVnUQOifkAepToEksYHgHhWW8lQEgkIePEghdFAQspBQGEhhDyssuMFGHgw8TNBh
 og4TeBjQ4IELvw4L0rqrDx48fvx+n9+/70NEOOtO3O6S2WxGzvOxRITTZ3L8lgwSozYjEgNuPkdg
 FG+Wd6zTvm0BABt30qIN4GjwPe4ufm0JPhfw+WJalAE07AHjP4/bAlLtjFuPrgsacEC54LZNcQ7A
@@ -89,15 +93,15 @@ GkPafPxAyh/mz/zS/wBO0EvM0Q2OnAAAAABJRU5ErkJggg=="""))
 
 # This sets the proper ownership and permissions.
 try:
-    chmod('/usr/sbin/btrfsguitools', S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | \
+    chmod('%s/sbin/btrfsguitools' % (prefix), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | \
                                      S_IXGRP)
-    chmod('/usr/share/btrfsguitools/snapshot.db', S_IRUSR | S_IWUSR | S_IRGRP \
+    chmod('%s/share/btrfsguitools/snapshot.db' % (prefix), S_IRUSR | S_IWUSR | S_IRGRP \
                                                                                      | S_IWGRP)
     try:
         GID = GetGIDByName('wheel')
     except KeyError:
         GID = -1
-    chown('/usr/sbin/btrfsguitools', GetUIDByName('root'), GID)
-    chown('/usr/share/btrfsguitools/snapshot.db', GetUIDByName('root'), GID)
+    chown('%s/sbin/btrfsguitools' % (prefix), GetUIDByName('root'), GID)
+    chown('%s/share/btrfsguitools/snapshot.db' % (prefix), GetUIDByName('root'), GID)
 except OSError:
     die("There was a error setting the proper ownership and permission.")
