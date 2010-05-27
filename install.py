@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """This is my installer, I have it as a template, so I use it as a install
-    framework for my software."""
+framework for my software."""
 from shutil     import             copy
 from shutil     import Error    as CopyError
 from os         import             chmod, chown
@@ -10,7 +10,7 @@ from stat       import             S_IRUSR, S_IWUSR, S_IXUSR, S_IRGRP, \
 from sys        import exit     as die
 from grp        import getgrnam as GetGroupStructByName
 from pwd        import getpwnam as GetUserStructByName
-import sqlite3, os
+import sqlite3, os, base64
 
 
 # The Get?ID's Get?StructByName functions return a structure of
@@ -74,6 +74,18 @@ c.execute("""CREATE TABLE snapshots (
 );""")
 conn.commit()
 c.close()
+
+open('/usr/share/btrfsguitools/icon.png','w').write(base64.decodestring("""iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACI0lEQVR4nH2TT0gUURzHP7PMyiPm
+8A6LDdFhCINhDVnUQOifkAepToEksYHgHhWW8lQEgkIePEghdFAQspBQGEhhDyssuMFGHgw8TNBh
+og4TeBjQ4IELvw4L0rqrDx48fvx+n9+/70NEOOtO3O6S2WxGzvOxRITTZ3L8lgwSozYjEgNuPkdg
+FG+Wd6zTvm0BABt30qIN4GjwPe4ufm0JPhfw+WJalAE07AHjP4/bAlLtjFuPrgsacEC54LZNcQ7A
+PYrxRgeJNRhHo3zN4viIbL+YbCm3LSCODaYS4iWQ7Ce4DkRBQGV9pdW53Wr2X09IvsOWfIctu1n7
+5L3aaUv53mVZytrSssbtvrTkch4rpYggBs9uThTVYSHvoX5HmDqorgG6l3esFMBWd1qMgeJqxJzj
+oQcaY5suDIALxcIopt/l7YEmRqMOQGdMg1zutWW3t1FqtdOW2Su2DD0ckqXn+SYFTj0tSDXryH6P
+I/WPU1LtbbSRMkrDNR83P4aXgeF+zfCPGqXNUlMLY5U1YttAxhBMLUBhGgDrZqctcx6Q0bhK4bo+
+5iBkT7mshDHvvvyy/r4aken1CsUuTW0vQvUPc//9JwsgtfPn2FpDE8YJCZDENULtE4QRc04MQLEa
+UXQSagng+SfB8J+UX964KjnfQ8chup5ADH3fDq2NZ0/ELweUjgyJrZj5ftgs6dMamO9xZP6SLbMX
+GkPafPxAyh/mz/zS/wBO0EvM0Q2OnAAAAABJRU5ErkJggg=="""))
 
 # This sets the proper ownership and permissions.
 try:
