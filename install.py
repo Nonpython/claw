@@ -89,10 +89,3 @@ try:
     chown('/usr/share/btrfsguitools/snapshot.db', GetUIDByName('root'), GID)
 except OSError:
     die("There was a error setting the proper ownership and permission.")
-
-# Some people may want a wrapper that automaticlly uses gksu[do]? for them.
-if raw_input('Do you want a wrapper? [yn] ').lower() == 'y':
-    open('/usr/bin/btrfsguitools', 'w').writelines(['#!/bin/sh\n',
-                                                    'gksu \
-                                                    /usr/sbin/btrfsguitools'
-                                                    ])
