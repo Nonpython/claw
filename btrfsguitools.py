@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys, os, sqlalchemy, sys, subprocess, time, sqlalchemy.orm, gtk
 from sqlalchemy.ext.declarative import declarative_base as _Base
+from sys                                    import exit                     as die
 
 #Checks to see if the SQLAlchemy version is in the right range.
 if  "0.6" not in sqlalchemy.__version__:
@@ -13,17 +14,11 @@ DeclarativeBase = _Base()
 # This flag gets funged by the installer to denote the install status of the
 # program.
 installed = False
+if not installed:
+    die("This needs to be installed before you can use it.")
 
-
-if not installed: # Checks if the source has been funged by the installer
-    engine = sqlalchemy.create_engine('sqlite://')  # 'sqlite://' is a magic
-                                                    # phrase to tell SQLAlchemy
-                                                    # to keep the SQLite
-                                                    # database in memory.
-else: # If this happens it has been funged by the installer, so I can talk to
-      # the existing SQLite database.
-    engine = sqlalchemy.create_engine(
-        'sqlite:////usr/share/btrfsguitools/snapshot.db')
+engine = sqlalchemy.create_engine(
+    'sqlite:///%s/share/btrfsguitools/snapshot.db' % (prefix))
 
 DBSession = sqlalchemy.orm.scoped_session(sqlalchemy.orm.sessionmaker(
                                                          bind=engine))

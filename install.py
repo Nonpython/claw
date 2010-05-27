@@ -13,9 +13,9 @@ from grp        import getgrnam as GetGroupStructByName
 from pwd        import getpwnam as GetUserStructByName
 import sqlite3, os, base64, getopt
 
-for OptTuple in getopt.getopt(argv[1:])[0]:
-    if OptTuple == '--prefix':
-        prefix = OptTuple[1]
+# [0][1][1] are the magic subscripts to get to the yummy center of the data from
+# getopt.getopt.
+prefix = getopt.getopt(argv[1:], ['--prefix='])[0][1][1]
 
 # The Get?ID's Get?StructByName functions return a structure of
 # useless (to us) information and one useful thing: the ?ID at the subscript
@@ -59,6 +59,7 @@ except CopyError:
 try:
     btrfsguitools = open('%s/sbin/btrfsguitools.py', (prefix), 'r').readlines()
     btrfsguitools[15] = 'installed = True\n'
+    btrfsguitools.insert(16, "prefix = '%s'\n" % prefix)
     open('%s/sbin/btrfsguitools.py' % (prefix), 'w').writelines(btrfsguitools)
 except IOError:
     die("There was a error modifing the program after the installation.")
