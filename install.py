@@ -57,12 +57,12 @@ except CopyError:
 
 # This funges the file so that it knows that it is installed.
 try:
-    btrfsguitools = open('%s/sbin/btrfsguitools.py', (prefix), 'r').readlines()
+    btrfsguitools = open('%s/sbin/btrfsguitools.py' % (prefix), 'r').readlines()
     btrfsguitools[15] = 'installed = True\n'
     btrfsguitools.insert(16, "prefix = '%s'\n" % prefix)
     open('%s/sbin/btrfsguitools.py' % (prefix), 'w').writelines(btrfsguitools)
 except IOError:
-    die("There was a error modifing the program after the installation.")
+    die("There was a error fixing the program after the installation.")
 
 try:
     os.mkdir('%s/share/btrfsguitools' % (prefix))
@@ -80,7 +80,9 @@ c.execute("""CREATE TABLE snapshots (
 conn.commit()
 c.close()
 
-open('%s/share/btrfsguitools/icon.png' % (prefix),'w').write(base64.decodestring("""iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACI0lEQVR4nH2TT0gUURzHP7PMyiPm
+open('%s/share/btrfsguitools/icon.png' % (prefix),'w').write(
+base64.decodestring(
+"""iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACI0lEQVR4nH2TT0gUURzHP7PMyiPm
 8A6LDdFhCINhDVnUQOifkAepToEksYHgHhWW8lQEgkIePEghdFAQspBQGEhhDyssuMFGHgw8TNBh
 og4TeBjQ4IELvw4L0rqrDx48fvx+n9+/70NEOOtO3O6S2WxGzvOxRITTZ3L8lgwSozYjEgNuPkdg
 FG+Wd6zTvm0BABt30qIN4GjwPe4ufm0JPhfw+WJalAE07AHjP4/bAlLtjFuPrgsacEC54LZNcQ7A
