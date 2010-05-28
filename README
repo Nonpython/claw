@@ -5,5 +5,3 @@ btrfs-tools
 
 Install:
 python install.py
-
-If you want to "try before you buy", just run btrfsguitools.py
