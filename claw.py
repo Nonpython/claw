@@ -81,6 +81,18 @@ class UIInterface(object, gtk.Window):
         pbar.hide()
         store.append(tdstamp, comment)
         
+    def RMSnapshot(self, datestamp):
+        pbar.show()
+        pbar.pulse()
+        ToRM = DBSession.query(SQLAlchemyMagic).filter_by(
+            timedate==datestamp).all()[0]
+        DBSession.delete(ToRM)
+        DBSession.commit()
+        for row in store:
+            if row[0] == datestamp:
+                subprocess.Popen("btrfsctl -D /claw-%s /" % row[0], shell=True)
+        
+
     def RunUI(self):
         self.connect("destroy", gtk.main_quit)
         self.set_title("Claw")
