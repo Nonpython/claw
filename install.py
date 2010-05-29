@@ -51,25 +51,25 @@ except:
 
 # This copies the file to the right location.
 try:
-    copy('./btrfsguitools.py', '%s/btrfsguitools' % prefix)
+    copy('./claw.py', '%s/sbin/claw' % prefix)
 except CopyError:
     die("There was a error installing the program.")
 
 # This funges the file so that it knows that it is installed.
 try:
-    btrfsguitools = open('%s/sbin/btrfsguitools.py' % (prefix), 'r').readlines()
-    btrfsguitools[15] = 'installed = True\n'
-    btrfsguitools.insert(16, "prefix = '%s'\n" % prefix)
-    open('%s/sbin/btrfsguitools.py' % (prefix), 'w').writelines(btrfsguitools)
+    clawsrc = open('%s/sbin/claw' % (prefix), 'r').readlines()
+    clawsrc[15] = 'installed = True\n'
+    clawsrc.insert(16, "prefix = '%s'\n" % prefix)
+    open('%s/sbin/claw' % (prefix), 'w').writelines(clawsrc)
 except IOError:
     die("There was a error fixing the program after the installation.")
 
 try:
-    os.mkdir('%s/share/btrfsguitools' % (prefix))
+    os.mkdir('%s/share/claw' % (prefix))
 except:
-    die('Something went wrong creating the directory "%s/share/btrfsguitools"!' % (prefix))
+    die('Something went wrong creating the directory "%s/share/claw"!' % (prefix))
 
-conn = sqlite3.connect('%s/share/btrfsguitools/snapshot.db' % (prefix))
+conn = sqlite3.connect('%s/share/claw/snapshot.db' % (prefix))
 c = conn.cursor()
 c.execute("""CREATE TABLE snapshots (
 	id INTEGER NOT NULL, 
@@ -80,7 +80,7 @@ c.execute("""CREATE TABLE snapshots (
 conn.commit()
 c.close()
 
-open('%s/share/btrfsguitools/icon.png' % (prefix),'w').write(
+open('%s/share/claw/icon.png' % (prefix),'w').write(
 base64.decodestring(
 """iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACI0lEQVR4nH2TT0gUURzHP7PMyiPm
 8A6LDdFhCINhDVnUQOifkAepToEksYHgHhWW8lQEgkIePEghdFAQspBQGEhhDyssuMFGHgw8TNBh
@@ -96,15 +96,15 @@ GkPafPxAyh/mz/zS/wBO0EvM0Q2OnAAAAABJRU5ErkJggg=="""))
 
 # This sets the proper ownership and permissions.
 try:
-    chmod('%s/sbin/btrfsguitools' % (prefix), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | \
+    chmod('%s/sbin/claw' % (prefix), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | \
                                      S_IXGRP)
-    chmod('%s/share/btrfsguitools/snapshot.db' % (prefix), S_IRUSR | S_IWUSR | S_IRGRP \
+    chmod('%s/share/claw/snapshot.db' % (prefix), S_IRUSR | S_IWUSR | S_IRGRP \
                                                                                      | S_IWGRP)
     try:
         GID = GetGIDByName('wheel')
     except KeyError:
         GID = -1
-    chown('%s/sbin/btrfsguitools' % (prefix), GetUIDByName('root'), GID)
-    chown('%s/share/btrfsguitools/snapshot.db' % (prefix), GetUIDByName('root'), GID)
+    chown('%s/sbin/claw' % (prefix), GetUIDByName('root'), GID)
+    chown('%s/share/claw/snapshot.db' % (prefix), GetUIDByName('root'), GID)
 except OSError:
     die("There was a error setting the proper ownership and permission.")
