@@ -33,8 +33,8 @@ class SQLAlchemyMagic(DeclarativeBase, object):
     timedate = sqlalchemy.Column(sqlalchemy.String)
     comment   = sqlalchemy.Column(sqlalchemy.String)
 
-    def __init__(self, date, comment):
-        self.date          = date
+    def __init__(self, timedate, comment):
+        self.timedate = timedate
         self.comment  = comment
         
     def __repr__(self):
@@ -71,14 +71,16 @@ class UIInterface(object, gtk.Window):
         return tdstamp
 
     def AddSnapshot(self, comment):
+        pbar.show()
+        pbar.pulse()
         tdstamp = self.TimeStamper()
-        #
-        subprocess.Popen("btrfsctl " + \
-                         "-s claw-%s /" % (tdstamp), shell=True)
+        subprocess.Popen("btrfsctl -s /claw-%s /" % (tdstamp), shell=True)
         DBSession.add(SQLAlchemyMagic(tdstamp, comment))
         DBSession.commit()
+        pbar.set_fraction(0.0)
+        pbar.hide()
         store.append(tdstamp, comment)
-             
+        
     def RunUI(self):
         self.connect("destroy", gtk.main_quit)
         self.set_title("Claw")
@@ -91,19 +93,19 @@ class UIInterface(object, gtk.Window):
             timein = item.timedate
             tdstamp = ''
             if item.datestamp[0:3] == 'Mon':
-                tdstamp += 'Monday '
+                tdstamp += 'Monday, '
             elif timein[0:3] == 'Tue':
-                tdstamp += 'Tuesday '
+                tdstamp += 'Tuesday, '
             elif timein[0:3] == 'Wed':
-                tdstamp += 'Wednesday '
+                tdstamp += 'Wednesday, '
             elif timein[0:3] == 'Thu':
-                tdstamp += 'Thursday '
+                tdstamp += 'Thursday, '
             elif timein[0:3] == 'Fri':
-                tdstamp += 'Friday '
+                tdstamp += 'Friday, '
             elif timein[0:3] == 'Sat':
-                tdstamp += 'Saturday '
+                tdstamp += 'Saturday, '
             elif timein[0:3] == 'Sun':
-                tdstamp += 'Sunday '
+                tdstamp += 'Sunday, '
             if timein[3:6] == 'Jan':
                 tdstamp += 'January '
             elif timein[3:6] == 'Feb':
@@ -146,15 +148,20 @@ class UIInterface(object, gtk.Window):
         column.set_sort_column_id(2)
         treeView.append_column(column)
         bbox = gtk.HButtonBox()
+        hbox = gtk.HBox(False, 50)
+        pbar = gtk.ProgressBar()
+        hbox.pack_start(pbar)
         bbox.set_layout(10)
         bbox.set_spacing(gtk.BUTTONBOX_END)
         bbox.add(gtk.Button('Create _New Snapshot'))
         bbox.add(gtk.Button('_Remove Existing Snapshot'))
+        hbox.pack_start(bbox)
         vbox = gtk.VBox(False, 4)
-        vbox.pack_start(bbox)
+        vbox.pack_start(hbox)
         vbox.pack_start(sw)
         self.add(vbox)
         self.show_all()
+        pbar.hide()
         gtk.main()
 
 UIClass  = UIInterface()
