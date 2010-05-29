@@ -70,10 +70,11 @@ class UIInterface(object, gtk.Window):
         tdstamp += "%i" % (timedate[5])
         return tdstamp
 
-    def AddDBItem(self, comment):
+    def AddSnapshot(self, comment):
         tdstamp = self.TimeStamper()
+        #
         subprocess.Popen("btrfsctl " + \
-                         "-s btrfsguitools-%s /" % (tdstamp), shell=True)
+                         "-s claw-%s /" % (tdstamp), shell=True)
         DBSession.add(SQLAlchemyMagic(tdstamp, comment))
         DBSession.commit()
         store.append(tdstamp, comment)
@@ -91,60 +92,43 @@ class UIInterface(object, gtk.Window):
             tdstamp = ''
             if item.datestamp[0:3] == 'Mon':
                 tdstamp += 'Monday '
-                
             elif timein[0:3] == 'Tue':
                 tdstamp += 'Tuesday '
-                
             elif timein[0:3] == 'Wed':
                 tdstamp += 'Wednesday '
-                
             elif timein[0:3] == 'Thu':
                 tdstamp += 'Thursday '
-                
             elif timein[0:3] == 'Fri':
                 tdstamp += 'Friday '
-                
             elif timein[0:3] == 'Sat':
                 tdstamp += 'Saturday '
-                
             elif timein[0:3] == 'Sun':
                 tdstamp += 'Sunday '
-                
             if timein[3:6] == 'Jan':
                 tdstamp += 'January '
-                
             elif timein[3:6] == 'Feb':
                 tdstamp += 'Febuary '
-                
             elif timein[3:6] == 'Mar':
                 tdstamp += 'March '
-                
             elif timein[3:6] == 'Apr':
                 tdstamp += 'April '
-                
             elif timein[3:6] == 'May':
                 tdstamp += 'March '
-                
             elif timein[3:6] == 'Jun':
                 tdstamp += 'June '
-                
+            elif timein[3:6] == 'Jul':
+                tdstamp += 'July'
             elif timein[3:6] == 'Aug':
                 tdstamp += 'August '
-                
             elif timein[3:6] == 'Sep':
                 tdstamp += 'September '
-                
             elif timein[3:6] == 'Oct':
                 tdstamp += 'October '
-                
             elif timein[3:6] == 'Nov':
                 tdstamp += 'November'
-                
             elif timein[3:6] == 'Dec':
                 tdstamp += 'December '
-                
             store.append(tdstamp, item.comment)
-
         treeView = gtk.TreeView(store)
         treeView.connect("row-activated", self.on_activated)
         treeView.set_rules_hint(True)
@@ -171,6 +155,7 @@ class UIInterface(object, gtk.Window):
         vbox.pack_start(sw)
         self.add(vbox)
         self.show_all()
+        gtk.main()
 
 UIClass  = UIInterface()
 
