@@ -47,7 +47,55 @@ class UIInterface(object, gtk.Window):
         super(UIInterface, self).__init__()
         self.metadata = DeclarativeBase.metadata
         # Checks the database for existing snapshots.
-        self.KnownItems = [column for column in DBSession.query(SQLAlchemyMagic).all()]
+        self.KnownItems = [column for column in \
+                           DBSession.query(SQLAlchemyMagic).all()]
+        daysofweek = {'Mon': 'Monday, ', 'Tue': 'Tuesday, ',
+                      'Wed': 'Wednesday, ', 'Thu': 'Thursday, ',
+                      'Fri': 'Friday, ', 'Sat': 'Saturday, ',
+                      'Sun': 'Sunday, '}
+        monthsofyear ={'Jan': 'January ', 'Feb': 'Febuary ',
+                       'Mar': 'March ', 'Apr': 'April ', 'May': 'May ',
+                       'Jun': 'June ', 'Jul': 'July', 'Aug': 'August ',
+                       'Sep': 'September ', 'Oct': 'October ',
+                       'Nov': 'November', 'Dec': 'December '}
+        numbersuffixes = {}
+        for x in range(0,4):
+            for y in range(0,10):
+                if x == 0:
+                    if y == 1:
+                       numbersuffixes[int('%i' % (y))] = '%ist ' % (y)
+                    elif y == 2:
+                       numbersuffixes[int('%i' % (y))] = '%ind ' % (y)
+                    elif y == 3:
+                       numbersuffixes[int('%i' % (y))] = '%ird ' % (y)
+                    elif y >= 4:
+                       numbersuffixes[int('%i' % (y))] = '%ith ' % (y)
+                elif x == 1:
+                    numbersuffixes[int('%i%i' % (x, y))] = '%i%ith ' % \
+                                                                  (x, y)
+                elif x == 2:
+                    if y == 0:
+                        numbersuffixes[int('%i%i' % (x, y))] = '%i%ith ' % \
+                                                                      (x, y)
+                    elif y == 1:
+                       numbersuffixes[int('%i%i' % (x, y))] = '%i%ist ' % \
+                                                                     (x, y)
+                    elif y == 2:
+                       numbersuffixes[int('%i%i' % (x, y))] = '%i%ind ' % \
+                                                                     (x, y)
+                    elif y == 3:
+                       numbersuffixes[int('%i%i' % (x, y))] = '%i%ird ' % \
+                                                                     (x, y)
+                    elif y >= 4:
+                       numbersuffixes[int('%i%i' % (x, y))] = '%i%ith ' % \
+                                                                     (x, y)
+                elif x == 3:
+                    if y == 0:
+                        numbersuffixes[int('%i%i' % (x, y))] = '%i%ith ' % \
+                                                                      (x, y)
+                    elif y == 1:
+                       numbersuffixes[int('%i%i' % (x, y))] = '%i%ist ' % \
+                                                                     (x, y)
 
     def TimeStamper(self):
         timedate = time.localtime()
@@ -65,10 +113,17 @@ class UIInterface(object, gtk.Window):
                             "Jun", "Jul", "Aug", "Sep", "Oct", \
                             "Nov", "Dec"][timedate[1]-1]
         tdstamp += str(timedate[2])
-        tdstamp += ",%i:" % (timedate[3])
+        tdstamp += ",%2i:" % (timedate[3])
         tdstamp += "%i:" % (timedate[4])
         tdstamp += "%i" % (timedate[5])
         return tdstamp
+    
+    def to12(hour24):
+        return (hour24 % 12) if (hour24 % 12) > 0 else 12
+
+    def IsPM(hour24):
+        return hour24 > 11
+
 
     def AddSnapshot(self, comment):
         pbar.show()
@@ -104,44 +159,16 @@ class UIInterface(object, gtk.Window):
         for item in self.KnownItems:
             timein = item.timedate
             tdstamp = ''
-            if item.datestamp[0:3] == 'Mon':
-                tdstamp += 'Monday, '
-            elif timein[0:3] == 'Tue':
-                tdstamp += 'Tuesday, '
-            elif timein[0:3] == 'Wed':
-                tdstamp += 'Wednesday, '
-            elif timein[0:3] == 'Thu':
-                tdstamp += 'Thursday, '
-            elif timein[0:3] == 'Fri':
-                tdstamp += 'Friday, '
-            elif timein[0:3] == 'Sat':
-                tdstamp += 'Saturday, '
-            elif timein[0:3] == 'Sun':
-                tdstamp += 'Sunday, '
-            if timein[3:6] == 'Jan':
-                tdstamp += 'January '
-            elif timein[3:6] == 'Feb':
-                tdstamp += 'Febuary '
-            elif timein[3:6] == 'Mar':
-                tdstamp += 'March '
-            elif timein[3:6] == 'Apr':
-                tdstamp += 'April '
-            elif timein[3:6] == 'May':
-                tdstamp += 'March '
-            elif timein[3:6] == 'Jun':
-                tdstamp += 'June '
-            elif timein[3:6] == 'Jul':
-                tdstamp += 'July'
-            elif timein[3:6] == 'Aug':
-                tdstamp += 'August '
-            elif timein[3:6] == 'Sep':
-                tdstamp += 'September '
-            elif timein[3:6] == 'Oct':
-                tdstamp += 'October '
-            elif timein[3:6] == 'Nov':
-                tdstamp += 'November'
-            elif timein[3:6] == 'Dec':
-                tdstamp += 'December '
+            tdstamp += daysofweek[timein[0:3]]
+            tdstamp += monthsofyear[timein[3:6]]
+            # Get date from datestamp 
+            tdstamp += '%s ' % (timein[6:8])
+            # Get time from the datestamp
+            tdstamp += '%i:%s ' % (self.to12(int(timein[9:11])), timein[12:14])
+            if self.IsPM(timein[9:11]):
+                tdstamp += 'PM '
+            else:
+                tdstamp += 'AM '
             store.append(tdstamp, item.comment)
         treeView = gtk.TreeView(store)
         treeView.connect("row-activated", self.on_activated)
