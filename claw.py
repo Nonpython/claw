@@ -143,9 +143,12 @@ class UIInterface(object, gtk.Window):
             timedate==datestamp).all()[0]
         DBSession.delete(ToRM)
         DBSession.commit()
+        path = -1
         for row in store:
+            path += 1 
             if row[0] == datestamp:
                 subprocess.Popen("btrfsctl -D /claw-%s /" % row[0], shell=True)
+                break
         
 
     def RunUI(self):
@@ -166,9 +169,9 @@ class UIInterface(object, gtk.Window):
             # Get time from the datestamp
             tdstamp += '%i:%s ' % (self.to12(int(timein[9:11])), timein[12:14])
             if self.IsPM(timein[9:11]):
-                tdstamp += 'PM '
+                tdstamp += 'PM'
             else:
-                tdstamp += 'AM '
+                tdstamp += 'AM'
             store.append(tdstamp, item.comment)
         treeView = gtk.TreeView(store)
         treeView.connect("row-activated", self.on_activated)
