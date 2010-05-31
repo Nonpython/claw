@@ -58,6 +58,13 @@ class UIInterface(object, gtk.Window):
                        'Jun': 'June ', 'Jul': 'July', 'Aug': 'August ',
                        'Sep': 'September ', 'Oct': 'October ',
                        'Nov': 'November', 'Dec': 'December '}
+        self.aysdialog = gtk.Dialog("Are you sure?",
+            None,
+            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+            (gtk.STOCK_NO, gtk.RESPONSE_REJECT,
+            gtk.STOCK_YES, gtk.RESPONSE_ACCEPT))
+        self.aysdialog.vbox.pack_start(gtk.Label("Are you sure you want to delete the snapshot?"))
+        self.aysdialog.connect("response", self.response_callback)
         numbersuffixes = {}
         for x in range(0,4):
             for y in range(0,10):
@@ -113,7 +120,7 @@ class UIInterface(object, gtk.Window):
                             "Jun", "Jul", "Aug", "Sep", "Oct", \
                             "Nov", "Dec"][timedate[1]-1]
         tdstamp += str(timedate[2])
-        tdstamp += ",%2i:" % (timedate[3])
+        tdstamp += ".%.2i:" % (timedate[3])
         tdstamp += "%i:" % (timedate[4])
         tdstamp += "%i" % (timedate[5])
         return tdstamp
@@ -124,6 +131,15 @@ class UIInterface(object, gtk.Window):
     def IsPM(hour24):
         return hour24 > 11
 
+    def response_callback(self, dialog, response_id):
+        self.aysdialog.hide_all()
+        if responce_id == gtk.RESPONCE_ACCEPT:
+            self.responce = True
+        elif responce_id == gtk.RESPONCE_REJECT:
+            self.responce = False
+        else:
+            self.responce = None
+        return None
 
     def AddSnapshot(self, comment):
         pbar.show()
@@ -137,28 +153,28 @@ class UIInterface(object, gtk.Window):
         store.append(tdstamp, comment)
         
     def RMSnapshot(self, datestamp):
-        pbar.show()
-        pbar.pulse()
+        self.aysdialog.show_all()
+        while True:
+            if not self.responce == None:
+                break
+        self.pbar.show()
+        self.pbar.pulse()
         ToRM = DBSession.query(SQLAlchemyMagic).filter_by(
             timedate==datestamp).all()[0]
         DBSession.delete(ToRM)
         DBSession.commit()
-        path = -1
-        for row in store:
-            path += 1 
-            if row[0] == datestamp:
-                subprocess.Popen("btrfsctl -D /claw-%s /" % row[0], shell=True)
-                break
+        self.store.remove(self.treeView.get_selection().get_selected()[1])
+        subprocess.Popen("btrfsctl -D /claw-%s /" % row[0], shell=True)
         
 
     def RunUI(self):
         self.connect("destroy", gtk.main_quit)
         self.set_title("Claw")
         self.set_icon_from_file("%s/share/btrfsguitools/claw.png" % (prefix))
-        sw = gtk.ScrolledWindow()
-        sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
-        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        store = gtk.ListStore(str, str)
+        self.sw = gtk.ScrolledWindow()
+        self.sw.set_shadow_type(gtk.SHADOW_ETCHED_IN)
+        self.sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        self.store = gtk.ListStore(str, str)
         for item in self.KnownItems:
             timein = item.timedate
             tdstamp = ''
@@ -172,32 +188,31 @@ class UIInterface(object, gtk.Window):
                 tdstamp += 'PM'
             else:
                 tdstamp += 'AM'
-            store.append(tdstamp, item.comment)
-        treeView = gtk.TreeView(store)
-        treeView.connect("row-activated", self.on_activated)
-        treeView.set_rules_hint(True)
-        sw.add(treeView)
+            self.store.append(tdstamp, item.comment)
+        self.treeView = gtk.TreeView(store)
+        self.treeView.set_rules_hint(True)
+        self.sw.add(treeView)
         rendererText = gtk.CellRendererText()
         column = gtk.TreeViewColumn("Date", rendererText, text=0)
         column.set_sort_column_id(0)    
-        treeView.append_column(column)
+        self.treeView.append_column(column)
         rendererText = gtk.CellRendererText()
         column = gtk.TreeViewColumn("Comment", rendererText, text=1)
         column.set_sort_column_id(1)
-        treeView.append_column(column)
+        self.treeView.append_column(column)
         rendererText = gtk.CellRendererText()
-        bbox = gtk.HButtonBox()
-        hbox = gtk.HBox(False, 50)
-        pbar = gtk.ProgressBar()
-        hbox.pack_start(pbar)
-        bbox.set_layout(10)
-        bbox.set_spacing(gtk.BUTTONBOX_END)
-        bbox.add(gtk.Button('Create _New Snapshot'))
-        bbox.add(gtk.Button('_Remove Existing Snapshot'))
-        hbox.pack_start(bbox)
-        vbox = gtk.VBox(False, 4)
-        vbox.pack_start(hbox)
-        vbox.pack_start(sw)
+        self.bbox = gtk.HButtonBox()
+        self.hbox = gtk.HBox(False, 50)
+        self.pbar = gtk.ProgressBar()
+        self.hbox.pack_start(pbar)
+        self.bbox.set_layout(10)
+        self.bbox.set_spacing(gtk.BUTTONBOX_END)
+        self.bbox.add(gtk.Button('Create _New Snapshot'))
+        self.bbox.add(gtk.Button('_Remove Existing Snapshot'))
+        self.hbox.pack_start(bbox)
+        self.vbox = gtk.VBox(False, 4)
+        self.vbox.pack_start(hbox)
+        self.vbox.pack_start(sw)
         self.add(vbox)
         self.show_all()
         pbar.hide()
