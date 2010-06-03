@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-import sys, os, sqlalchemy, sys, subprocess, time, sqlalchemy.orm, gtk
+import sqlalchemy, subprocess, time, sqlalchemy.orm, gtk
 from sqlalchemy.ext.declarative import declarative_base as _Base
 from sys                        import exit             as die
 
 #Checks to see if the SQLAlchemy version is in the right range.
 if  "0.6" not in sqlalchemy.__version__:
-    sys.exit("Your SQLAlchemy is too old or too new!\nYou need 0.6.0 or newer \
+    die("Your SQLAlchemy is too old or too new!\nYou need 0.6.0 or newer \
 but older then 0.7.0.")
 
 #Converts the magic function to the magic class.
