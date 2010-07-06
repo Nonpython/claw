@@ -3,7 +3,7 @@
 framework for my software."""
 from shutil     import             copy
 from shutil     import Error    as CopyError
-from os         import             chmod, chown
+from os         import             chmod, chown, access, W_OK
 from os         import getuid   as GetProcessUID
 from stat       import             S_IRUSR, S_IWUSR, S_IXUSR, S_IRGRP, \
                                            S_IWGRP, S_IXGRP
@@ -15,8 +15,10 @@ import sqlite3, os, base64, getopt
 
 # [0][1][1] are the magic subscripts to get to the yummy center of the data from
 # getopt.getopt.
-prefix = getopt.getopt(argv[1:], ['--prefix='])[0][1][1]
-
+try:
+      prefix = getopt.getopt(argv[1:], None, ['prefix='])[0][1][1]
+except:
+      prefix = '/usr/local'
 # The Get?ID's Get?StructByName functions return a structure of
 # useless (to us) information and one useful thing: the ?ID at the subscript
 # [2].
@@ -40,14 +42,11 @@ try:
 except ImportError:
     die("You need SQLAlchemy 0.6.0 or newer but a older version then 0.7.0.")
 
+import pygtk
 try:
-    import pygtk
-    try:
-        pygtk.require('2.10')
-    except AssertionError:
-        die()
-except:
-    die("You need PyGTK 2.10 or newer, preferably 2.12 or newer.")
+          pygtk.require('2.0')
+except AssertionError:
+      die()
 
 # This copies the file to the right location.
 try:

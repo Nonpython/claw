@@ -104,36 +104,29 @@ class UIInterface(object, gtk.Window):
                        numbersuffixes[int('%i%i' % (x, y))] = '%i%ist ' % \
                                                                      (x, y)
       
-      def responseToDialog(self, entry, dialog, response):
-     	      dialog.response(response)
+    def responseToDialog(self, entry, dialog, response):
+            dialog.response(response)
       
-      def getText(self):
-         	#base this on a message dialog
-         	dialog = gtk.MessageDialog(
-      	None,
-      	gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-      	gtk.MESSAGE_QUESTION,
-            gtk.BUTTONS_OK,
-            None)
-            dialog.set_markup('Please enter your <b>comment</b>:')
-            #create the text input field
-            entry = gtk.Entry()
-            #allow the user to press enter to do ok
-            entry.connect("activate", self.responseToDialog, dialog, gtk.RESPONSE_OK)
-            #create a horizontal box to pack the entry and a label
-            hbox = gtk.HBox()
-            hbox.pack_start(gtk.Label("Comment:"), False, 5, 5)
-        	hbox.pack_end(entry)
-        	#some secondary text
-            dialog.format_secondary_markup("If it is empty, there is no comment")
-            #add it and show it
-            dialog.vbox.pack_end(hbox, True, True, 0)
-            dialog.show_all()
-            #go go go
-            dialog.run()
-            text = entry.get_text()
-            dialog.destroy()
-            return text
+    def getText(self):
+        dialog = gtk.MessageDialog(
+        None,
+        gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+        gtk.MESSAGE_QUESTION,
+        gtk.BUTTONS_OK,
+        None)
+        dialog.set_markup('Please enter your <b>comment</b>:')
+        entry = gtk.Entry()
+        entry.connect("activate", self.responseToDialog, dialog, gtk.RESPONSE_OK)
+        hbox = gtk.HBox()
+        hbox.pack_start(gtk.Label("Comment:"), False, 5, 5)
+        hbox.pack_end(entry)
+        dialog.format_secondary_markup("If it is empty, there is no comment")
+        dialog.vbox.pack_end(hbox, True, True, 0)
+        dialog.show_all()
+        dialog.run()
+        text = entry.get_text()
+        dialog.destroy()
+        return text
 
     def TimeStamper(self):
         timedate = time.localtime()
@@ -224,7 +217,7 @@ class UIInterface(object, gtk.Window):
             self.store.append(tdstamp, item.comment)
         self.treeView = gtk.TreeView(store)
         self.treeView.set_rules_hint(True)
-        self.sw.add(treeView)
+        self.sw.add(self.treeView)
         rendererText = gtk.CellRendererText()
         column = gtk.TreeViewColumn("Date", rendererText, text=0)
         column.set_sort_column_id(0)    
@@ -252,7 +245,7 @@ class UIInterface(object, gtk.Window):
         self.vbox.pack_start(self.sw)
         self.add(self.vbox)
         self.show_all()
-        pbar.hide()
+        self.pbar.hide()
 
 UIClass  = UIInterface()
 UIClass.RunUI()
