@@ -103,6 +103,37 @@ class UIInterface(object, gtk.Window):
                     elif y == 1:
                        numbersuffixes[int('%i%i' % (x, y))] = '%i%ist ' % \
                                                                      (x, y)
+      
+      def responseToDialog(self, entry, dialog, response):
+     	      dialog.response(response)
+      
+      def getText(self):
+         	#base this on a message dialog
+         	dialog = gtk.MessageDialog(
+      	None,
+      	gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+      	gtk.MESSAGE_QUESTION,
+            gtk.BUTTONS_OK,
+            None)
+            dialog.set_markup('Please enter your <b>comment</b>:')
+            #create the text input field
+            entry = gtk.Entry()
+            #allow the user to press enter to do ok
+            entry.connect("activate", self.responseToDialog, dialog, gtk.RESPONSE_OK)
+            #create a horizontal box to pack the entry and a label
+            hbox = gtk.HBox()
+            hbox.pack_start(gtk.Label("Comment:"), False, 5, 5)
+        	hbox.pack_end(entry)
+        	#some secondary text
+            dialog.format_secondary_markup("If it is empty, there is no comment")
+            #add it and show it
+            dialog.vbox.pack_end(hbox, True, True, 0)
+            dialog.show_all()
+            #go go go
+            dialog.run()
+            text = entry.get_text()
+            dialog.destroy()
+            return text
 
     def TimeStamper(self):
         timedate = time.localtime()
@@ -115,7 +146,7 @@ class UIInterface(object, gtk.Window):
         # the time.struct_time's month
         # field counts from 1, while
         # python sequence subscripts
-         # count from 0.
+        # count from 0.
         tdstamp += ["Jan", "Feb", "Mar", "Apr", "May", \
                             "Jun", "Jul", "Aug", "Sep", "Oct", \
                             "Nov", "Dec"][timedate[1]-1]
@@ -141,10 +172,11 @@ class UIInterface(object, gtk.Window):
             self.responce = None
         return None
 
-    def AddSnapshot(self, comment):
+    def AddSnapshot(self):
         pbar.show()
         pbar.pulse()
         tdstamp = self.TimeStamper()
+        comment = self.getText()
         subprocess.Popen("btrfsctl -s /claw-%s /" % (tdstamp), shell=True)
         DBSession.add(SQLAlchemyMagic(tdstamp, comment))
         DBSession.commit()
@@ -152,8 +184,9 @@ class UIInterface(object, gtk.Window):
         pbar.hide()
         store.append(tdstamp, comment)
         
-    def RMSnapshot(self, datestamp):
+    def RMSnapshot(self):
         self.aysdialog.show_all()
+        self.treeView.set_sensitive(False)
         while True:
             if not self.responce == None:
                 break
@@ -207,17 +240,20 @@ class UIInterface(object, gtk.Window):
         self.hbox.pack_start(pbar)
         self.bbox.set_layout(10)
         self.bbox.set_spacing(gtk.BUTTONBOX_END)
-        self.bbox.add(gtk.Button('Create _New Snapshot'))
-        self.bbox.add(gtk.Button('_Remove Existing Snapshot'))
+        self.button1 = gtk.Button('Create _New Snapshot')
+        self.bbox.add(self.button1)
+        self.button2 = gtk.Button('_Remove Existing Snapshot')
+        self.bbox.add(self.button2)
+        self.button1.connect("clicked", self.AddSnapshot)
+        self.button2.connect("clicked", self.RMSnapshot)
         self.hbox.pack_start(bbox)
         self.vbox = gtk.VBox(False, 4)
-        self.vbox.pack_start(hbox)
-        self.vbox.pack_start(sw)
-        self.add(vbox)
+        self.vbox.pack_start(self.hbox)
+        self.vbox.pack_start(self.sw)
+        self.add(self.vbox)
         self.show_all()
         pbar.hide()
-        gtk.main()
 
 UIClass  = UIInterface()
-
 UIClass.RunUI()
+gtk.main()
